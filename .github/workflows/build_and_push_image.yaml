@@ -6,6 +6,9 @@ on:
       TAG:
         required: true
         type: string
+    secrets:
+      PERSONAL_ACCESS_TOKEN:
+        required: true
 
 jobs:
   build-and-push:
