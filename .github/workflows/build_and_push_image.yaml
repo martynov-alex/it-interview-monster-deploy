@@ -15,7 +15,8 @@ jobs:
       packages: write
     env:
         IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend-image
-        DEPLOYMENT_FOLDER: deploy
+        DEPLOYMENT_REPOSITORY: https://github.com/martynov-alex/it-interview-monster-deploy.git
+        DEPLOYMENT_FOLDER: it-interview-monster-deploy
         DEPLOYMENT_FILE: 1-deployment.yaml
     steps:
       - name: Checkout it-interview-monster-backend private repository
@@ -37,17 +38,12 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
 
-      - name: Checkout deploy (this) repository
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.DEPLOYMENT_FOLDER }}
-
       - name: Update deployment file, commit and push changes
         run: |
-          cd ${{ env.DEPLOYMENT_FOLDER }}
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          cd deployment/k8s-manifests
+          git clone ${{ env.DEPLOYMENT_REPOSITORY }}
+          cd ${{ env.DEPLOYMENT_FOLDER }}/deployment/k8s-manifests
           sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ inputs.TAG }}|" ${{ env.DEPLOYMENT_FILE }}
           git add ${{ env.DEPLOYMENT_FILE }}
           git commit -m "Update deployment image version to ${{ inputs.TAG }}"
