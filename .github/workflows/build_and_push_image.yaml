@@ -6,9 +6,6 @@ on:
       TAG:
         required: true
         type: string
-    secrets:
-      PERSONAL_ACCESS_TOKEN:
-        required: true
 
 jobs:
   build-and-push:
@@ -18,20 +15,13 @@ jobs:
       packages: write
     env:
         IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend-image
-        BACKEND_REPOSITORY_NAME: it-interview-monster-backend
+        DEPLOYMENT_FOLDER: deploy
         DEPLOYMENT_FILE: 1-deployment.yaml
     steps:
       - name: Checkout it-interview-monster-backend private repository
         uses: actions/checkout@v4
         with:
-          # repository: ${{ github.repository_owner }}/${{ env.BACKEND_REPOSITORY_NAME }}
-          # token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: backend
-
-      - name: Access cloned repository content
-        run: |
-          pwd
-          ls -la
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -39,11 +29,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Access cloned repository content
-        run: |
-          pwd
-          ls -la
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -51,27 +36,14 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
 
-      - name: Access cloned repository content
-        run: |
-          pwd
-          ls -la
-
       - name: Checkout deploy (this) repository
         uses: actions/checkout@v4
         with:
-          path: deploy
-
-      - name: Access cloned repository content
-        run: |
-          pwd
-          ls -la
+          path: ${{ env.DEPLOYMENT_FOLDER }}
 
       - name: Update deployment file, commit and push changes
         run: |
-          pwd
-          ls -la
-          cd ..
-          ls -la
+          cd ${{ env.DEPLOYMENT_FOLDER }}
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           cd deployment/k8s-manifests
