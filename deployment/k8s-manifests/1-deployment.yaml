@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: itinterviewmonster
-          image: ghcr.io/martynov-alex/itinterviewmonster:v0.0.1-02
+          image: ghcr.io/martynov-alex/it-interview-monster-backend:v
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

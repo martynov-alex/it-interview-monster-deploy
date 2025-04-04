@@ -14,7 +14,7 @@ jobs:
       contents: write
       packages: write
     env:
-        IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend-image
+        IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend
         DEPLOYMENT_REPOSITORY: https://github.com/martynov-alex/it-interview-monster-deploy.git
         DEPLOYMENT_FOLDER: it-interview-monster-deploy
         DEPLOYMENT_FILE: 1-deployment.yaml
