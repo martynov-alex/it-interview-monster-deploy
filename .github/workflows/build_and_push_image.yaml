@@ -24,9 +24,9 @@ jobs:
       - name: Checkout it-interview-monster-backend private repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository_owner }}/${{ env.BACKEND_REPOSITORY_NAME }}
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          path: ${{ env.BACKEND_REPOSITORY_NAME }}
+          # repository: ${{ github.repository_owner }}/${{ env.BACKEND_REPOSITORY_NAME }}
+          # token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          path: backend
 
       - name: Access cloned repository content
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Checkout deploy (this) repository
         uses: actions/checkout@v4
         with:
-          path: ${{ github.repository }}
+          path: deploy
 
       - name: Access cloned repository content
         run: |
@@ -69,6 +69,8 @@ jobs:
       - name: Update deployment file, commit and push changes
         run: |
           pwd
+          ls -la
+          cd ..
           ls -la
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
