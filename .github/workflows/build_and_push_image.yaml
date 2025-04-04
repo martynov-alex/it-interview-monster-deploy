@@ -21,11 +21,6 @@ jobs:
         BACKEND_REPOSITORY_NAME: it-interview-monster-backend
         DEPLOYMENT_FILE: 1-deployment.yaml
     steps:
-      - name: Checkout deploy (this) repository
-        uses: actions/checkout@v4
-        with:
-          path: ${{ github.repository }}
-
       - name: Checkout it-interview-monster-backend private repository
         uses: actions/checkout@v4
         with:
@@ -36,6 +31,8 @@ jobs:
       - name: Access cloned repository content
         run: |
           cd ${{ env.BACKEND_REPOSITORY_NAME }}
+          pwd
+          ls -la
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -47,9 +44,13 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
+
+      - name: Checkout deploy (this) repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.repository }}
 
       - name: Update deployment file, commit and push changes
         run: |
