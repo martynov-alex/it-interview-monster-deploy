@@ -1,0 +1,60 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      TAG:
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+        IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend-image
+        BACKEND_REPOSITORY_NAME: it-interview-monster-backend
+        DEPLOYMENT_FILE: 1-deployment.yaml
+    steps:
+      - name: Checkout deploy (this) repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.repository }}
+
+      - name: Checkout it-interview-monster-backend private repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.BACKEND_REPOSITORY_NAME }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          path: ${{ env.BACKEND_REPOSITORY_NAME }}
+
+      - name: Access cloned repository content
+        run: |
+          cd ${{ env.BACKEND_REPOSITORY_NAME }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
+          push: true
+
+      - name: Update deployment file, commit and push changes
+        run: |
+          cd ../${{ env.BACKEND_REPOSITORY_NAME }}
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          cd deployment/k8s-manifests
+          sed -i "s|${{ env.IMAGE_NAME }}:.*|${{ env.IMAGE_NAME }}:${{ inputs.TAG }}|" ${{ env.DEPLOYMENT_FILE }}
+          git add ${{ env.DEPLOYMENT_FILE }}
+          git commit -m "Update deployment image version to ${{ inputs.TAG }}"
+          git push

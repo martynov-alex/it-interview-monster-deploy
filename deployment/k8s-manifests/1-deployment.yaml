@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: itinterviewmonster
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      k8s-app: itinterviewmonster
+  template:
+    metadata:
+      labels:
+        k8s-app: itinterviewmonster
+    spec:
+      containers:
+        - name: itinterviewmonster
+          image: ghcr.io/martynov-alex/itinterviewmonster:v0.0.1-02
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: # Гарантированные ресурсы
+              cpu: "0.2" # 20% от 1 ядра
+              memory: 64Mi # 64 Mb
+            limits: # Максимальные ресурсы
+              cpu: "0.4" # 40% от 1 ядра
+              memory: 128Mi

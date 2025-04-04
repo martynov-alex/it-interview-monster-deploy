@@ -1,0 +1,16 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: it-interview-monster
+
+servers: 1
+
+kubeAPI:
+  host: "prod.itinterview.monster"
+  hostIP: "77.222.46.229"
+  hostPort: "6445"
+
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer

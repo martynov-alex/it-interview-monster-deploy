@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name     : itinterviewmonster
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: default
+  source:
+    path   : k8s-manifests
+    repoURL: https://github.com/martynov-alex/it-interview-monster-backend.git
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune   : true
+      selfHeal: true
