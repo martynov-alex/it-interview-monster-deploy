@@ -1,3 +1,3 @@
 # IT interview monster deployment manifests
 
-ArgoCD manifests for deployment of the application to Kubernetes.
+ArgoCD manifests for deploying the application to Kubernetes.
