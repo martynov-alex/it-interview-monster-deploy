@@ -6,6 +6,9 @@ on:
       TAG:
         required: true
         type: string
+    secrets:
+      PERSONAL_ACCESS_TOKEN:
+        required: true
 
 jobs:
   build-and-push:
@@ -43,6 +46,7 @@ jobs:
         with:
           repository: ${{ github.actor }}/${{ env.DEPLOYMENT_REPOSITORY }}
           path: ${{ env.DEPLOYMENT_FOLDER }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Update deployment file, commit and push changes
         run: |
