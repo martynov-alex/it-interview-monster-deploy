@@ -26,7 +26,7 @@ jobs:
       - name: Checkout it-interview-monster-backend private repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.actor }}/${{ env.BACKEND_REPOSITORY_NAME }}
+          repository: ${{ github.repository_owner }}/${{ env.BACKEND_REPOSITORY_NAME }}
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: ${{ env.BACKEND_REPOSITORY_NAME }}
 
