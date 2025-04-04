@@ -28,11 +28,10 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: ${{ env.BACKEND_REPOSITORY_NAME }}
 
-      # - name: Access cloned repository content
-      #   run: |
-      #     cd ${{ env.BACKEND_REPOSITORY_NAME }}
-      #     pwd
-      #     ls -la
+      - name: Access cloned repository content
+        run: |
+          pwd
+          ls -la
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -40,6 +39,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Access cloned repository content
+        run: |
+          pwd
+          ls -la
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -47,14 +51,25 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
 
+      - name: Access cloned repository content
+        run: |
+          pwd
+          ls -la
+
       - name: Checkout deploy (this) repository
         uses: actions/checkout@v4
         with:
           path: ${{ github.repository }}
 
+      - name: Access cloned repository content
+        run: |
+          pwd
+          ls -la
+
       - name: Update deployment file, commit and push changes
         run: |
           pwd
+          ls -la
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           cd deployment/k8s-manifests
