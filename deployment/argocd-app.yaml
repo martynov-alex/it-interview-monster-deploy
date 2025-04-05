@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name     : itinterviewmonster
+  name     : it-interview-monster
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -11,7 +11,7 @@ spec:
     namespace: default
   source:
     path   : k8s-manifests
-    repoURL: https://github.com/martynov-alex/it-interview-monster-backend.git
+    repoURL: https://github.com/martynov-alex/it-interview-monster-deploy.git
     targetRevision: HEAD
   project: default
   syncPolicy:

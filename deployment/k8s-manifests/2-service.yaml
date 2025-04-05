@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: itinterviewmonster
+  name: it-interview-monster
   namespace: default
 spec:
   selector:
-    k8s-app: itinterviewmonster
+    k8s-app: it-interview-monster
   ports:
     - protocol: TCP
       port: 80

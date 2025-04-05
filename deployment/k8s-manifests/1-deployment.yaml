@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: itinterviewmonster
+  name: it-interview-monster
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 1
   selector:
     matchLabels:
-      k8s-app: itinterviewmonster
+      k8s-app: it-interview-monster
   template:
     metadata:
       labels:
-        k8s-app: itinterviewmonster
+        k8s-app: it-interview-monster
     spec:
       containers:
-        - name: itinterviewmonster
+        - name: it-interview-monster
           image: ghcr.io/martynov-alex/it-interview-monster-backend:v0
           imagePullPolicy: IfNotPresent
           ports:
