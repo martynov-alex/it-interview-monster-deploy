@@ -9,6 +9,10 @@ on:
     secrets:
       PERSONAL_ACCESS_TOKEN:
         required: true
+      ENV_VARIABLES:
+        required: true
+      ENV_SECRETS:
+        required: true
 
 jobs:
   build-and-push:
@@ -34,6 +38,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and prepare .env file
+        run: |
+          touch .env
+          echo "APP_NAME=it-interview-monster" > .env
+          echo "APP_VERSION=${{ inputs.TAG }}" >> .env
+          echo "${{ secrets.ENV_VARIABLES }}" >> .env
+          echo "${{ secrets.ENV_SECRETS }}" >> .env
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
