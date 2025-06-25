@@ -45,7 +45,7 @@ jobs:
           touch .env
           echo "APP_NAME=it-interview-monster" > .env
           echo "APP_VERSION=${{ inputs.TAG }}" >> .env
-          echo "${{ secrets.ENV_VARIABLES }}" >> .env
+          echo "${{ inputs.ENV_VARIABLES }}" >> .env
           echo "${{ secrets.ENV_SECRETS }}" >> .env
 
       - name: Build and push Docker image
