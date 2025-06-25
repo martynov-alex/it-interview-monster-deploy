@@ -6,10 +6,11 @@ on:
       TAG:
         required: true
         type: string
+      ENV_VARIABLES:
+        required: true
+        type: string
     secrets:
       PERSONAL_ACCESS_TOKEN:
-        required: true
-      ENV_VARIABLES:
         required: true
       ENV_SECRETS:
         required: true
