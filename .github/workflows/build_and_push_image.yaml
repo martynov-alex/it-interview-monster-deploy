@@ -63,6 +63,7 @@ jobs:
         with:
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
+          context: ${{ env.SOURCE_FOLDER }}
 
       - name: Migrate
         uses: vovavc/migrate-github-action@v0.2.1
