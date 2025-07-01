@@ -70,10 +70,6 @@ jobs:
         with:
           path: .env
 
-      - run: |
-          echo "POSTGRES_HOST=${{ steps.load-env.outputs.postgres_host }}"
-          echo "POSTGRES_PORT=${{ steps.load-env.outputs.postgres_port }}"
-
       - name: Migrate
         uses: vovavc/migrate-github-action@v0.2.1
         with:
