@@ -62,11 +62,6 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     env:
-        POSTGRES_USER: ''
-        POSTGRES_PASSWORD: ''
-        POSTGRES_HOST: ''
-        POSTGRES_PORT: ''
-        POSTGRES_DB_NAME: ''
         MIGRATE_PATH: ./migration/postgres
     steps:
       - name: Checkout it-interview-monster-backend repository
