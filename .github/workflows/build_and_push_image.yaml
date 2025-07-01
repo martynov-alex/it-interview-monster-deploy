@@ -67,17 +67,26 @@ jobs:
         POSTGRES_HOST: ''
         POSTGRES_PORT: ''
         POSTGRES_DB_NAME: ''
-        MIGRATE_PATH: migration/postgres
+        MIGRATE_PATH: ./migration/postgres
     steps:
+      - name: Checkout it-interview-monster-backend repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.TAG }}
+
+      - name: Create and prepare .env file
+        run: |
+          echo "${{ secrets.ENV_SECRETS }}" > .env
+
       - name: Load env variables
         uses: falti/dotenv-action@v1
         with:
-          path: ./${{ env.SOURCE_FOLDER }}/.env
+          path: .env
 
       - name: Migrate
         uses: vovavc/migrate-github-action@v0.2.1
         with:
-            path: ./${{ env.SOURCE_FOLDER }}/${{ env.MIGRATE_PATH }}
+            path: ${{ env.MIGRATE_PATH }}
             database: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB_NAME }}
             command: up
 
