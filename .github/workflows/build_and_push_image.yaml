@@ -33,7 +33,7 @@ jobs:
         POSTGRES_DB_NAME: ''
         MIGRATE_PATH: ./migration/postgres
     steps:
-      - name: Checkout it-interview-monster-backend private repository
+      - name: Checkout it-interview-monster-backend repository
         uses: actions/checkout@v4
         with:
           path: ${{ env.SOURCE_FOLDER }}
@@ -48,7 +48,6 @@ jobs:
 
       - name: Create and prepare .env file
         run: |
-          cd ${{ env.SOURCE_FOLDER }}
           echo "APP_NAME=it-interview-monster" > .env
           echo "APP_VERSION=${{ inputs.TAG }}" >> .env
           echo "${{ inputs.ENV_VARIABLES }}" >> .env
@@ -57,7 +56,7 @@ jobs:
       - name: Load env variables
         uses: falti/dotenv-action@v1
         with:
-          path: ./${{ env.SOURCE_FOLDER }}/.env
+          path: .env
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
