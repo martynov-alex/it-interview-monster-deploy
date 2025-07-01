@@ -22,15 +22,21 @@ jobs:
       contents: write
       packages: write
     env:
+        SOURCE_FOLDER: backend
         IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend
-        DEPLOYMENT_REPOSITORY: it-interview-monster-deploy
         DEPLOYMENT_FOLDER: deploy
         DEPLOYMENT_FILE: 1-deployment.yaml
+        POSTGRES_USER: ''
+        POSTGRES_PASSWORD: ''
+        POSTGRES_HOST: ''
+        POSTGRES_PORT: ''
+        POSTGRES_DB_NAME: ''
+        MIGRATE_PATH: ./migration/postgres
     steps:
       - name: Checkout it-interview-monster-backend private repository
         uses: actions/checkout@v4
         with:
-          path: backend
+          path: ${{ env.SOURCE_FOLDER }}
           ref: ${{ inputs.TAG }}
 
       - name: Log in to GitHub Container Registry
@@ -42,11 +48,16 @@ jobs:
 
       - name: Create and prepare .env file
         run: |
-          touch .env
+          cd ${{ env.SOURCE_FOLDER }}
           echo "APP_NAME=it-interview-monster" > .env
           echo "APP_VERSION=${{ inputs.TAG }}" >> .env
           echo "${{ inputs.ENV_VARIABLES }}" >> .env
           echo "${{ secrets.ENV_SECRETS }}" >> .env
+
+      - name: Load env variables
+        uses: falti/dotenv-action@v1
+        with:
+          path: .env
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -54,10 +65,17 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:${{ inputs.TAG }}
           push: true
 
+      - name: Migrate
+        uses: vovavc/migrate-github-action@v0.2.1
+        with:
+            path: ${{ env.MIGRATE_PATH }}
+            database: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB_NAME }}
+            command: up
+
       - name: Checkout deploy repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.actor }}/${{ env.DEPLOYMENT_REPOSITORY }}
+          repository: ${{ github.actor }}/it-interview-monster-deploy
           path: ${{ env.DEPLOYMENT_FOLDER }}
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
