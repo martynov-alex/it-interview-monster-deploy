@@ -15,23 +15,16 @@ on:
       ENV_SECRETS:
         required: true
 
+env:
+  SOURCE_FOLDER: backend
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
-    env:
-        SOURCE_FOLDER: backend
-        IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/it-interview-monster-backend
-        DEPLOYMENT_FOLDER: deploy
-        DEPLOYMENT_FILE: 1-deployment.yaml
-        POSTGRES_USER: ''
-        POSTGRES_PASSWORD: ''
-        POSTGRES_HOST: ''
-        POSTGRES_PORT: ''
-        POSTGRES_DB_NAME: ''
-        MIGRATE_PATH: ./migration/postgres
     steps:
       - name: Checkout it-interview-monster-backend repository
         uses: actions/checkout@v4
@@ -65,13 +58,36 @@ jobs:
           push: true
           context: ${{ env.SOURCE_FOLDER }}
 
+  migrate:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    env:
+        POSTGRES_USER: ''
+        POSTGRES_PASSWORD: ''
+        POSTGRES_HOST: ''
+        POSTGRES_PORT: ''
+        POSTGRES_DB_NAME: ''
+        MIGRATE_PATH: migration/postgres
+    steps:
+      - name: Load env variables
+        uses: falti/dotenv-action@v1
+        with:
+          path: ./${{ env.SOURCE_FOLDER }}/.env
+
       - name: Migrate
         uses: vovavc/migrate-github-action@v0.2.1
         with:
-            path: ${{ env.MIGRATE_PATH }}
+            path: ./${{ env.SOURCE_FOLDER }}/${{ env.MIGRATE_PATH }}
             database: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB_NAME }}
             command: up
 
+  update-deployment-file:
+    needs: migrate
+    runs-on: ubuntu-latest
+    env:
+        DEPLOYMENT_FOLDER: deploy
+        DEPLOYMENT_FILE: 1-deployment.yaml
+    steps:
       - name: Checkout deploy repository
         uses: actions/checkout@v4
         with:
