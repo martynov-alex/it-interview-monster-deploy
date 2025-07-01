@@ -6,13 +6,10 @@ on:
       TAG:
         required: true
         type: string
-      ENV_VARIABLES:
-        required: true
-        type: string
     secrets:
       PERSONAL_ACCESS_TOKEN:
         required: true
-      ENV_SECRETS:
+      ENV_FILE:
         required: true
 
 env:
@@ -43,13 +40,7 @@ jobs:
         run: |
           echo "APP_NAME=it-interview-monster" > ${{ env.SOURCE_FOLDER }}/.env
           echo "APP_VERSION=${{ inputs.TAG }}" >> ${{ env.SOURCE_FOLDER }}/.env
-          echo "${{ inputs.ENV_VARIABLES }}" >> ${{ env.SOURCE_FOLDER }}/.env
-          echo "${{ secrets.ENV_SECRETS }}" >> ${{ env.SOURCE_FOLDER }}/.env
-
-      - name: Load env variables
-        uses: falti/dotenv-action@v1
-        with:
-          path: ./${{ env.SOURCE_FOLDER }}/.env
+          echo "${{ secrets.ENV_FILE }}" >> ${{ env.SOURCE_FOLDER }}/.env
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -62,11 +53,6 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     env:
-        POSTGRES_HOST: ''
-        POSTGRES_PORT: 0
-        POSTGRES_DB_NAME: ''
-        POSTGRES_USER: ''
-        POSTGRES_PASSWORD: ''
         MIGRATE_PATH: ./migration/postgres
     steps:
       - name: Checkout it-interview-monster-backend repository
@@ -76,23 +62,23 @@ jobs:
 
       - name: Create and prepare .env file
         run: |
-          echo "${{ secrets.ENV_SECRETS }}" > .env
+          echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Load env variables
+        id: load-env
         uses: falti/dotenv-action@v1
         with:
           path: .env
 
       - run: |
-          echo "POSTGRES_HOST=${{ env.POSTGRES_HOST }}"
-          echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}"
-          echo "POSTGRES_DB_NAME=${{ env.POSTGRES_DB_NAME }}"
+          echo "POSTGRES_HOST=${{ steps.load-env.outputs.postgres_host }}"
+          echo "POSTGRES_PORT=${{ steps.load-env.outputs.postgres_port }}"
 
       - name: Migrate
         uses: vovavc/migrate-github-action@v0.2.1
         with:
             path: ${{ env.MIGRATE_PATH }}
-            database: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.POSTGRES_HOST }}:${{ env.POSTGRES_PORT }}/${{ env.POSTGRES_DB_NAME }}
+            database: postgres://${{ steps.load-env.outputs.postgres_user }}:${{ steps.load-env.outputs.postgres_password }}@${{ steps.load-env.outputs.postgres_host }}:${{ steps.load-env.outputs.postgres_port }}/${{ steps.load-env.outputs.postgres_db_name }}
             command: up
 
   update-deployment-file:
